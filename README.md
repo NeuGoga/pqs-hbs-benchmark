@@ -75,7 +75,7 @@ You must have the **Open Quantum Safe (liboqs)** library installed. Because this
     cmake .. -DCMAKE_PREFIX_PATH="C:\path\to\liboqs"
     cmake --build . --config Release
     ```
-4. **Important:** Copy the `oqs.dll` file from your `liboqs/build/bin/Release` folder into this project's `build/bin/Release` folder so the executable can find it.
+4. **Important:** Copy the `oqs.dll` file from your `liboqs/build/bin/Release` folder into this project's `build/Release` folder so the executable can find it.
 
 ### Linux
 
@@ -100,7 +100,7 @@ The project create two executables:
 
 **Windows:**
 ```cmd
-cd build/bin/Release
+cd build/Release
 tester.exe
 ```
 
