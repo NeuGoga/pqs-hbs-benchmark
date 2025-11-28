@@ -4,28 +4,40 @@ project(PQC_HBS_Benchmark)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(UNIX)
-    list(APPEND CMAKE_PREFIX_PATH "/usr/local")
-endif()
+find_package(OpenSSL REQUIRED)
+message(STATUS "Found OpenSSL: " ${OPENSSL_INCLUDE_DIR})
 
-find_package(liboqs REQUIRED)
+find_path(OQS_INCLUDE_DIR
+    NAMES oqs/oqs.h
+    HINTS
+        "/usr/local/include"
+        "/usr/include"
+        "C:/Program Files/liboqs/include"
+        $ENV{liboqs_DIR}/include        
+)
 
-if(TARGET liboqs::liboqs)
-    set(OQS_TARGET liboqs::liboqs)
-    message(STATUS "Found liboqs::liboqs target.")
-elseif(TARGET liboqs)
-    set(OQS_TARGET liboqs)
-    message(STATUS "Found liboqs target (no namespace).")
+find_library(OQS_LIBRARY
+    NAMES oqs liboqs
+    HINTS
+        "/usr/local/lib"
+        "/usr/lib"
+        "C:/Program Files/liboqs/lib"
+        $ENV{liboqs_DIR}/lib        
+)
+
+if (OQS_INCLUDE_DIR AND OQS_LIBRARY)
+    message(STATUS "Found OQS Header: ${OQS_INCLUDE_DIR}")
+    message(STATUS "Found OQS Library: ${OQS_LIBRARY}")
 else()
-    message(STATUS "Creating imported target for liboqs from variables")
-    add_library(liboqs::liboqs INTERFACE IMPORTED)
-    target_include_directories(liboqs::liboqs INTERFACE ${liboqs_INCLUDE_DIRS})
-    target_link_libraries(liboqs::liboqs INTERFACE ${liboqs_LIBRARIES})
-    set(OQS_TARGET liboqs::liboqs)
+    message(FATAL_ERROR "Could NOT find liboqs. \n")
 endif()
 
 add_executable(benchmark src/benchmark.cpp)
-target_link_libraries(benchmark PRIVATE ${OQS_TARGET})
+target_link_libraries(benchmark PRIVATE 
+    ${OQS_LIBRARY}
+    OpenSSL::SSL
+    OpenSSL::Crypto
+)
 
 if(MSVC)
     set_target_properties(benchmark PROPERTIES LINK_FLAGS "/STACK:10000000")
