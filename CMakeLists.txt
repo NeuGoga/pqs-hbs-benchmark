@@ -6,6 +6,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(liboqs REQUIRED)
 
+if(NOT liboqs_FOUND)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(liboqs REQUIRED liboqs)
+
+    add_library(liboqs::liboqs INTERFACE IMPORTED)
+    target_include_directories(liboqs::liboqs INTERFACE ${liboqs_INCLUDE_DIRS})
+    target_link_libraries(liboqs::liboqs INTERFACE ${liboqs_INCLUDE_DIRS})
+endif()
+
 add_executable(benchmark src/benchmark.cpp)
 target_link_libraries(benchmark PRIVATE liboqs::liboqs)
 
